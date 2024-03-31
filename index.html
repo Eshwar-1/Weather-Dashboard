@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #3498db;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header-content img {
+            height: 50px;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        .date {
+            font-size: 1.2em;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 5%;
+            margin-left: 10%;
+            margin-right: 10%;
+        }
+
+        .left-div {
+            margin-right: 20px;
+            flex: 25%; 
+        }
+
+        .right-div {
+            text-align: center;
+            flex: 45%; 
+        }
+
+        #location-input {
+            padding: 8px;
+            margin-right: 10px;
+            width: 71%;
+        }
+
+        #search-button {
+            padding: 8px 16px;
+            margin-top: 2%;
+            background-color:#3498db ;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            width: 75%;
+        }
+
+        .weather-info h2 {
+            margin-bottom: 10px;
+        }
+
+        .weather-info p {
+            margin: 5px 0;
+        }
+
+        .right-div h2 {
+            background-color: lightblue;
+        }
+
+        .right-div h4{
+            text-align: left;
+            margin-left: 2%;
+        }
+
+        .search-history {
+            margin-bottom: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .search-history-item {
+            margin-bottom: 5px;
+        }
+
+        #clear-history-button {
+            background-color: lightblue;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-top: 10px; 
+            width: 75%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="header-content">
+            <img src="images1.jpg" alt="Sun and Clouds">
+            <h1>Weather Dashboard</h1>
+        </div>
+        <div class="date" id="current-date">Loading...</div>
+    </header>
+
+    <!-- Body Section -->
+    <div class="container">
+        <!-- Left Div - Search Box -->
+        <div class="left-div">
+            <input type="text" id="location-input" placeholder="Enter city or state">
+            <button id="search-button">Search</button>
+            <div class="search-history" id="search-history"></div>
+            <button id="clear-history-button">Clear History</button>
+        </div>
+
+        <!-- Right Div - Weather Information -->
+
+        <div class="right-div">
+            <h2 id="location-name">City, Country</h2>
+            <h4> <p id="weather-condition">Conditions: </p> </h4>
+            <h4> <p id="temperature">Temperature: </p> </h4>
+            <h4> <p id="humidity">Humidity: </p> </h4>
+            <h4>  <p id="wind-speed">Wind Speed: </p> </h4>
+        </div>
+    </div>
+
+    <script>
+        // Function to fetch weather data from OpenWeatherMap API
+        async function fetchWeather(location) {
+            const apiKey = '965d576b58e8ca8fbe24be67fa4a9930'; // Replace with your OpenWeatherMap API key
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.log('Error fetching weather data:', error);
+                return null;
+            }
+        }
+
+        // Function to display weather information
+        function displayWeather(data) {
+            if (data) {
+                const locationName = `${data.name}, ${data.sys.country}`;
+                const weatherCondition = `Conditions: ${data.weather[0].description}`;
+                const temperature = `Temperature: ${data.main.temp}°C`;
+                const humidity = `Humidity: ${data.main.humidity}%`;
+                const windSpeed = `Wind Speed: ${data.wind.speed} m/s`;
+
+                document.getElementById('location-name').textContent = locationName;
+                document.getElementById('weather-condition').textContent = weatherCondition;
+                document.getElementById('temperature').textContent = temperature;
+                document.getElementById('humidity').textContent = humidity;
+                document.getElementById('wind-speed').textContent = windSpeed;
+            } else {
+                alert('Weather data not available. Please try again.');
+            }
+        }
+
+        // Function to handle search button click
+        document.getElementById('search-button').addEventListener('click', async () => {
+            const locationInput = document.getElementById('location-input').value;
+            if (locationInput) {
+                const weatherData = await fetchWeather(locationInput);
+                displayWeather(weatherData);
+                saveToHistory(locationInput);
+            } else {
+                alert('Please enter a city or state name.');
+            }
+        });
+        
+        // Function to save search history
+        function saveToHistory(location) {
+        }
+    
+
+
+
+        // Function to get current date in specified format
+        function getCurrentDate() {
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const date = new Date();
+            const dayOfWeek = days[date.getDay()];
+            const day = date.getDate();
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            return `${dayOfWeek}, ${month} ${day}, ${year}`;
+        }
+
+        // Display current date in header
+        document.getElementById('current-date').textContent = getCurrentDate();
+    </script>
+</body>
+</html>
